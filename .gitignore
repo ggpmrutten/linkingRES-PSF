@@ -1,0 +1,22 @@
+# Shows which files are not deposited  to Git repository
+.Rproj.user
+.Rhistory
+.RData
+.Ruserdata
+ 
+# Additional files to not deposit online (* before indicates all files with ending)
+leftovers.R
+
+*.Rproj
+*.html  
+*.csv
+*.png
+*.jpg
+*.tiff
+*.xls
+
+# Folders
+/Data
+/Plots
+/Old
+/reviewedCode
