@@ -4,18 +4,18 @@
 ##  Project: Review Plant & Soil
 ##
 ##  by  Gemma Rutten (gemma.rutten@unibe.ch)
-##      Last Edited July 2022
+##      Last Edited January 23
 ##
 ##
-### Used data from Crawford et al 2019 and Bennett et al 
+### Used data from Crawford et al 2019, Petermann et al 2008 and Bennett et al 2017
 
 ## clean working space 
 cat("\014") 
 rm(list=ls())
 
 ## set path
-path <- "C:/analysis/linkingRES&PSF"
-setwd(path)
+#path <- "C:/analysis/linkingRES&PSF"
+#setwd(path)
 
 ## load packages
 library(tidyverse)
@@ -28,7 +28,6 @@ se<-function(x){sd(na.omit(x))/length(na.omit(x))}
 ## load data
 #### table with plant species names and performance on home and away soil
 ## three studies used 
-
 
 ###### Study 1 Pairwise PSF meta analysis #######
 
@@ -73,7 +72,7 @@ save(PSFs.A, file = "Data/home.vs.Away.PSF.cra.Rdata")
 Species.A<-tibble(species.full=unique(PSFs.A$Species.A));Species.B<-tibble(species.full=unique(PSFs.A$Species.B))
 species.list<-Species.A %>% full_join(Species.B)# 155 species 
 ## save a species list for trait db 
-write.csv2(species.list, "C:/analysis/GRooT-Data-master/DataFiles/linking.RES.PSF.SpeciesList.cra.csv")
+write.csv2(species.list, "Data/linking.RES.PSF.SpeciesList.cra.csv")
 
 ## check if species number is correct
 levels(as.factor(PSFs.A$Species.A))# 117 species
@@ -124,8 +123,8 @@ save(PSFs.B, file = "Data/home.vs.Away.PSF.ben.Rdata")
 ## Save a species list for the Root trait database
 Species.A<-tibble(species.full=unique(PSFs.B$Species.A));Species.B<-tibble(species.full=unique(PSFs.B$Species.B))
 species.list<-Species.A %>% full_join(Species.B)# 44 species 
-## save a species list for trait db 
-write.csv2(species.list, "C:/analysis/GRooT-Data-master/DataFiles/linking.RES.PSF.SpeciesList.ben.csv")
+## save a species list for GRoot trait db in other directory
+write.csv2(species.list, "Data/linking.RES.PSF.SpeciesList.ben.csv")
 
 ## check if species number is correct
 table(as.factor(PSFs.B$Species.A))# 10 species
@@ -207,7 +206,6 @@ data<-raw.data %>%
 data$HA=ifelse(data$Species.A == data$Species.B, "home", "away")
 
 ### calculate PSF first separate home from away soils
-
 H<-data %>%
   filter(HA=="home")
 A<-data %>%
@@ -237,8 +235,8 @@ save(PSFs.C, file = "Data/home.vs.Away.PSF.pet.Rdata")
 ## Save a species list for the Root trait database
 Species.A<-tibble(species.full=unique(PSFs.C$Species.A));Species.B<-tibble(species.full=unique(PSFs.C$Species.B))
 species.list<-Species.A %>% full_join(Species.B)# 24 species 
-## save a species list for trait db 
-write.csv2(species.list, "C:/analysis/GRooT-Data-master/DataFiles/linking.RES.PSF.SpeciesList.pet.csv")
+## save a species list for GRoot trait db in other directory
+write.csv2(species.list, "Data/linking.RES.PSF.SpeciesList.pet.csv")
 
 ## check if species number is correct
 table(as.factor(PSFs.C$Species.A))# 10 ind

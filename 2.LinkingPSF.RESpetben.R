@@ -4,17 +4,18 @@
 ##  Review Plant&Soil
 ##
 ##  by  Gemma Rutten (gemma.rutten@unibe.ch)
-##      Last Edited July 2022
+##      Last Edited January 23
 ##
 ##
 ###
+
 ## clean working space 
 cat("\014") 
 rm(list=ls())
 
 ## set path
-path <- "C:/analysis/linkingRES&PSF"
-setwd(path)
+#path <- "C:/analysis/linkingRES&PSF"
+#setwd(path)
 
 ## load packages
 library(vegan)
@@ -26,8 +27,6 @@ library(ape)
 library(tidyverse)
 
 ## load functions 
-source("C:/analysis/functions/correlationplots.R")
-# source("C:/analysis/functions/GreenFigures.R")
 len<-function(x){length(na.omit(x))} 
 mansca<-function(x){x/sqrt(sum(x^2)/(length(x)-1))}
 
@@ -73,15 +72,11 @@ sterPSFs.C<-PSFs.C %>%
          "AinA.N", "AinB.mean", "AinB.se","AinB.N")%>%
   `colnames<-`(c("Species.pair", "st.AinA.mean", "st.AinA.se",
                  "st.AinA.N", "st.AinB.mean", "st.AinB.se","st.AinB.N"))
-#
-#
-#
-#
+
 #save(Pairwise.Petermann, file = "Data/pw.PSF.pet.Rdata") #pairwise
 load("Data/pw.PSF.pet.Rdata") #PSFs petermann
 summary(Pairwise.Petermann)# 240 comparisons with 5 different treatments
 names(Pairwise.Petermann)# Peterman has a control and sterile treatment
-
 
 lifePSFs.C<-Pairwise.Petermann %>% 
   filter(treat == "control")%>%
@@ -102,8 +97,9 @@ sel.PSFs.C$Hbio = log(sel.PSFs.C$AinA.mean / sel.PSFs.C$st.AinA.mean)
 sel.PSFs.C$Abio = log(sel.PSFs.C$AinB.mean / sel.PSFs.C$st.AinB.mean)
 sel.PSFs.C$Study<-c("petermann")## selected common columns
 
-# combine  we now leave A out because there is no sterile treatment
-names(sel.PSFs.A)
+# combine data sets bennett and petermann
+# NOTE: we leave A out because there is no sterile treatment
+#names(sel.PSFs.A)# crawford
 names(sel.PSFs.B);length(sel.PSFs.B$Species.pair)#79
 names(sel.PSFs.C[,-c(10:15,17,18)]);length(sel.PSFs.C[,-c(10:15,17,18)]$Species.pair)#48
 
@@ -112,22 +108,23 @@ str(PSFs)#127
 
 # Tables with Species and selected root traits
 ## save (traits.RES, file = paste0(root, "/traits.RES.benpet.Rdata")) in sRoot_extr RES script
-load( "C:/analysis/GRooT-Data-master/traits.RES.benpet.Rdata")#
+#load( "C:/analysis/GRooT-Data-master/traits.RES.benpet.Rdata")#
 #load( "C:/analysis/GRooT-Data-master/DataFiles/RES.Species.together.Rdata")
+load( "Data/traits.RES.benpet.Rdata")#
 summary(traits.RES)# 35 species with root traits in the database
 names(traits.RES)
 
 ## pairwise pearson correlations between 4 traits
-sdat<-traits.RES%>%
-  select(Root_diameter_corrected,RTD_corrected,rootN_corrected,SRL_corrected)
+# source("C:/analysis/functions/correlationplots.R")
+# sdat<-traits.RES%>%
+#  select(Root_diameter_corrected,RTD_corrected,rootN_corrected,SRL_corrected)
+# r_plot<-round(cor(sdat,use="pairwise.complete.obs",method= "pearson"),2)
+# write.table(r_plot, file="corr.coef.csv", sep=",")
 
-r_plot<-round(cor(sdat,use="pairwise.complete.obs",method= "pearson"),2)
-write.table(r_plot, file="corr.coef.csv", sep=",")
-
-trial<-round(cor.test.p(sdat), 3)
-write.table(trial, file="corr.p.csv", sep=",")
-# D ~ SRL seems ok r=-0.53 p= <0.001
-# N ~ RTD not at all correlated
+# trial<-round(cor.test.p(sdat), 3)
+# write.table(trial, file="corr.p.csv", sep=",")
+#  D ~ SRL seems ok r=-0.53 p= <0.001
+#  N ~ RTD not at all correlated
 
 ## bind together bind PSF and Traits
 try2<-PSFs %>% 
@@ -143,7 +140,6 @@ try2<-PSFs %>%
 names(try2)
 summary(try2)## 61 pairwise comparisons
 head(try2)
-
 
 ### Calculate PSF direction based root traits using these formula
 ## PSF    <- ifelse(away>home,(home/away-1),(home+abs(away)/abs(away)))
@@ -177,12 +173,10 @@ str(try3)# 61 obs.
 #try3$sc.cons.diff <- scale (try3$cons.diff)
 
 ## save clean combined file
-save (try3, file = paste0(path, "/Data/PSF.RES.benpet.Rdata")) # 2.linking PSF with RES
+save (try3, file ="Data/PSF.RES.benpet.Rdata") # 2.linking PSF with RES
 
 ## save a species list for supplementary
 str(try3)
 tableS2<-try3 %>%
   select(Species.pair,coll.diff,cons.diff,coll.mid,cons.mid,HAa)
 write.table(tableS2, "tableS2.csv")
-
-

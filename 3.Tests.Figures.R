@@ -2,17 +2,18 @@
 ##  Review Plant&Soil
 ##
 ##  by  Gemma Rutten (gemma.rutten@unibe.ch)
-##      Last Edited June 2022
+##      Last Edited January 23
 ##
 ##
 ###
+
 ## clean working space 
 cat("\014") 
 rm(list=ls())
 
 ## set path
-path <- "C:/analysis/linkingRES&PSF"
-setwd(path)
+#path <- "C:/analysis/linkingRES&PSF"
+#setwd(path)
 
 ## load packages
 library(vegan)
@@ -26,20 +27,17 @@ library(ggeffects)
 library(lme4)
 
 ## load functions 
-source("C:/analysis/functions/correlationplots.R")
+# source("C:/analysis/functions/GreenFigures.R")
+len<-function(x){length(na.omit(x))} 
+mansca<-function(x){x/sqrt(sum(x^2)/(length(x)-1))}
 
+## load tweaks 
 myArrow <- function(x0, y0, x1, y1, cut = .95, ...){
   x.new <- (1 - cut) * x0 + cut * x1
   y.new <- (1 - cut) * y0 + cut * y1
   # segments(x0, y0, x1, y1, ...) #if you want the arrow to continue
   arrows(x0, y0, x.new, y.new, ...)
 }
-
-# source("C:/analysis/functions/GreenFigures.R")
-len<-function(x){length(na.omit(x))} 
-mansca<-function(x){x/sqrt(sum(x^2)/(length(x)-1))}
-
-## tweaks 
 
 ## load data
 # save (try3, file = paste0(path, "/Data/PSF.RES.benpet.Rdata")) # 2.linking PSF with RES
@@ -49,10 +47,11 @@ table(try3$Study)
 ##
 
 ## test linear correlations between the variables
-sdat<-try3%>%
-  select(SRL_corrected.x,SRL_corrected.y,rootN_corrected.x,rootN_corrected.y,PCA1rev.x, PCA2.x,PCA1rev.y, PCA2.y,coll.mid,coll.diff,cons.mid,cons.diff)
-r_plot<-round(cor(sdat,use="pairwise.complete.obs",method= "pearson"),2)
-write.table(r_plot, file="corr.coef.derived.vars.csv", sep=",")
+#source("C:/analysis/functions/correlationplots.R")
+#sdat<-try3%>%
+#  select(SRL_corrected.x,SRL_corrected.y,rootN_corrected.x,rootN_corrected.y,PCA1rev.x, PCA2.x,PCA1rev.y, PCA2.y,coll.mid,coll.diff,cons.mid,cons.diff)
+#r_plot<-round(cor(sdat,use="pairwise.complete.obs",method= "pearson"),2)
+#write.table(r_plot, file="corr.coef.derived.vars.csv", sep=",")
 
 ## best fit for correlations linear or quadratic?
 y<-try3$coll.mid
@@ -62,15 +61,8 @@ quad  <-lm(y~ x+ x2)### calculate quad model I(x^2)
 
 anova(lin, quad)# no linear corr but quad fit for conservation only.(pairwise also for)
 
-##stats
-
 ## stat tests
 ## HA effects explained by species pairs characteristics
-
-
-#### 
-##### PAIRWISE CHANGES!
-####
 
 # full model Feedback Home.away
 m1<-lm(HAa~ 
@@ -84,34 +76,34 @@ m1<-lm(HAa~
        + cons.mid : coll.diff
        + cons.mid : cons.diff
        + coll.diff: cons.diff
-       + coll.mid : cons.mid :coll.diff
-       + coll.mid : cons.mid :cons.diff #1 90.619 9.604 0.001942 **
-       + cons.mid : coll.diff:cons.diff
-       + coll.mid : coll.diff:cons.diff
-       + coll.mid :cons.mid : coll.diff:cons.diff
+       + coll.mid : cons.mid : coll.diff
+       + coll.mid : cons.mid : cons.diff 
+       + cons.mid : coll.diff: cons.diff
+       + coll.mid : coll.diff: cons.diff
+       + coll.mid : cons.mid : coll.diff: cons.diff# -6.136e-06  1.836e-06  -3.343  0.00168 **
        , data=try3)
 
 summary(m1)
 anova(m1)
+# sign 4 way interaction
+# Residual standard error: 0.4486 on 45 degrees of freedom
+# Multiple R-squared:  0.5721,	Adjusted R-squared:  0.4295 
+# F-statistic: 4.011 on 15 and 45 DF,  p-value: 0.0001479
 
 # full model Feedback Home sterile
 m2<-lm(Hbio~ 
        + PCA1rev.x
-       + PCA2.x
-       + PCA1rev.x :PCA2.x
+       + PCA2.x              # 11.4588 0.001294 **
+       + PCA1rev.x :PCA2.x   #  5.9355 0.017986 * 
        , data=try3)
 anova(m2)
 summary(m2)
+# Residual standard error: 0.7028 on 57 degrees of freedom
+# Multiple R-squared:  0.2348,	Adjusted R-squared:  0.1946 
+# F-statistic: 5.831 on 3 and 57 DF,  p-value: 0.001514
 
 ## figures
 gems<-c("olivedrab3", "lightgoldenrod4")
-
-myArrow <- function(x0, y0, x1, y1, cut = .95, ...){
-  x.new <- (1 - cut) * x0 + cut * x1
-  y.new <- (1 - cut) * y0 + cut * y1
-  # segments(x0, y0, x1, y1, ...)
-  arrows(x0, y0, x.new, y.new, ...)
-}
 
 # PSFs in Trait space (Figure 4)
 tiff('Plots/PSFs.in.traitspace.petben.tiff',
@@ -240,7 +232,7 @@ abline(v=0, col="lightgray");abline(h=0, col="lightgray")
 text(-try3$PCA1.x,try3$PCA2.x, font=3,
      labels = try3$Species.A ,pos=3, offset = 0.15, cex=.5, col="darkgray")
 
-legend("topright",inset = c( -0, 0), title=expression("PSF"[home/sterile]),
+legend("topright",inset = c( -0, 0), title=expression("PSF"[live/control]),
        paste0(levels(droplevels(as.factor(meanHbio$PSF_fact)))),
        cex=1, pch=16,col=psfcols, bty="n" )
 
@@ -407,10 +399,7 @@ dev.off()
   )
 
 
-
 ggplot(gg.prd, aes(coll.mid, predicted))
-       
-       
   geom_point(position = position_dodge(.1)) +
   geom_errorbar(
     aes(ymin = conf.low, ymax = conf.high),
@@ -424,10 +413,7 @@ ggplot(gg.prd, aes(coll.mid, predicted))
         panel.grid.minor = element_blank(), 
         plot.title = element_text(size = rel(1.1)),
         panel.border = element_blank(),axis.line = element_line()) 
-
-
   scale_x_discrete(breaks = 1:3, labels = get_x_labels(dat))
-
 
 ggplot(d, aes(x=cons.diff,y= DV))+
   geom_point(data=try3,aes(x=cons.diff,y=scale(HAa)))+
@@ -441,8 +427,6 @@ ggplot(d, aes(x=cons.diff,y= DV))+
         panel.grid.minor = element_blank(), 
         plot.title = element_text(size = rel(1.1)),
         panel.border = element_blank(),axis.line = element_line()) 
-
-
 
 d = with(try3, 
          data.frame(coll.mid = rep(seq(min(coll.mid), max(coll.mid), length.out=20),6),
@@ -498,7 +482,6 @@ figa<-ggplot(d, aes(x=cons.diff,y= DV))+
         plot.title = element_text(size = rel(1.1)),
         panel.border = element_blank(),axis.line = element_line()) 
 figa
-
 
 ## fancier test accounting for SpeciesA while no reps for species pairs
 library(lme4)
