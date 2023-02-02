@@ -154,7 +154,7 @@ points(try3$PCA1rev.x,try3$PCA2.x,
 
 dev.off()
 
-# relations between variables (supllementary)
+# relations between variables (supplementary)
 stratcols<-c(rgb(1,0, 0), "gray", rgb(1, 0, 1),rgb(0, 0, 1))
 
 tiff('Plots/relationsbetweenvariables.tiff',
@@ -216,7 +216,7 @@ range(try3$Hbio)
 
 meanHbio$PSF_fact<-cut(meanHbio$PSF, c(-3,-2,-1,0,1), labels= c(-2,-1,0,1))
 
-# the actual figure
+# # PSF home sterile over gradients (Figure 5) the actual figure
 psfcols<-c("red", "orange", "lightgray","darkblue")
 
 tiff('Plots/IsolatedHomeEffects.tiff',
@@ -244,6 +244,7 @@ text(40,-33, 'DIY-slow', col=c("darkgray"),cex=1)
 dev.off()
 
 # show the three way interactions (Figure 6)
+
 ## now separate the continuous variables into 3 categories
 try3$cons.diff_fact<-as.factor(cut(try3$cons.diff,c(-55,-5,5,55), labels=c("negative", "same strategy", "positive")))
 table(try3$cons.diff_fact)
