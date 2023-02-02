@@ -7,7 +7,7 @@
 ##      Last Edited January 23
 ##
 ##
-### Used data from Crawford et al 2019, Petermann et al 2008 and Bennett et al 2017
+### Used data from Petermann et al 2008 and Bennett et al 2017
 
 ## clean working space 
 cat("\014") 
@@ -27,59 +27,7 @@ se<-function(x){sd(na.omit(x))/length(na.omit(x))}
 
 ## load data
 #### table with plant species names and performance on home and away soil
-## three studies used 
-
-###### Study 1 Pairwise PSF meta analysis #######
-
-# read in data Crawford
-dat <- read.csv("Data/CrawfordDataSupplementary Table 1.csv", sep=";")
-glimpse(dat)#1038
-# include only whole soils
-table(dat$Inoculant.type)
-dat <- filter(dat, Inoculant.type == "WholeSoil")#968
-table(dat$Origin)
-dat <- filter(dat, Origin == "NativeNative")#776
-
-table(dat$ Ecosystem)## careful this is system not life form !!!
-
-#dat[dat$Species.B=="sporobolus_heterolepis",]
-
-# Calculate PSFs 
-PSFs.A <- dat %>%
-  mutate(HAa = log(AinA.mean / AinB.mean),
-         HAb = log(BinB.mean / BinA.mean),
-         pwAB = HAa+HAb,
-         #pw1 = log(AinA.mean / AinB.mean) + log(BinB.mean / BinA.mean),
-         #pw2 = log(AinA.mean) - log(AinB.mean) - log(BinA.mean) + log(BinB.mean),
-         var = 
-           ((AinA.se * sqrt(AinA.N))^2 / (AinA.N*(AinA.mean^2))+
-           (BinA.se * sqrt(BinA.N))^2 / (AinB.N*(AinB.mean^2))+
-           (AinB.se * sqrt(AinB.N))^2 / (BinA.N*(BinA.mean^2))+
-           (BinB.se * sqrt(BinB.N))^2 / (BinB.N*(BinB.mean^2))))
-## Clean up species names
-PSFs.A<-PSFs.A %>%
-  mutate(Species.B = gsub("(^|[[:space:]])([[:alpha:]])", "\\1\\U\\2", Species.B, perl=T)) %>%
-  mutate(Species.B = gsub("_", " ", Species.B))
-
-PSFs.A<-PSFs.A %>%
-  mutate(Species.A = gsub("(^|[[:space:]])([[:alpha:]])", "\\1\\U\\2", Species.A, perl=T)) %>%
-  mutate(Species.A = gsub("_", " ", Species.A))
-
-## save PSFs
-save(PSFs.A, file = "Data/home.vs.Away.PSF.cra.Rdata") 
-
-## Save a species list for the Root trait database
-Species.A<-tibble(species.full=unique(PSFs.A$Species.A));Species.B<-tibble(species.full=unique(PSFs.A$Species.B))
-species.list<-Species.A %>% full_join(Species.B)# 155 species 
-## save a species list for trait db 
-write.csv2(species.list, "Data/linking.RES.PSF.SpeciesList.cra.csv")
-
-## check if species number is correct
-levels(as.factor(PSFs.A$Species.A))# 117 species
-levels(as.factor(PSFs.A$Species.B))# 119 species
-intersect(levels(as.factor(PSFs.A$Species.A)), levels(as.factor(PSFs.A$Species.B)))# 81common
-81+(117-81)+(119-81)# 155 species
-
+## strated with 3 studies Crawford was left out because no sterile treatmentswere used 
 
 #####  Study 2. H/A PSF in Forests #######
 
@@ -157,6 +105,8 @@ PSFs.B[PSFs.B$Species.pair %in% B$Species.pair,] ## only two species pairs pairw
 
 # Acer saccharum_Fraxinus americana & Betula papyrifera_Pinus strobus
 Pairwise.Bennett<-merge(PSFs.B,B[c(1,8:13)], by="Species.pair")
+
+
 
 #####  Study 3. Pairwise PSF in Grassland communities with exclusion #######
 
