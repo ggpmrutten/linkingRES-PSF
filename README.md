@@ -9,6 +9,7 @@ Last edited 01/01/2023
 1. SpeciesPSF.R script collects data from publications (using A. Crawford.csv, B. Bennett.csv, C. Petermann.csv)
  * |- Prepares species lists for root trait database (sRoot_extraction.RES.PSF.R) see B below
  * |- Consistent formating of the plant soil feedback (PSF) variables (Linking PSF.RESpetben.R)
+ 
  * 1b. sRoot_extraction.RES.PSF.R collects root traits from database (sRoot.trait.Rdata) based on [GRoot](https://groot-database.github.io/GRooT/) 
   for species lists (study B and C) from script 1
  * |- Collection of root traits for the species lists
