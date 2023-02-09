@@ -2,7 +2,7 @@
 ##  Review Plant&Soil
 ##
 ##  by  Gemma Rutten (gemma.rutten@unibe.ch)
-##      Last Edited January 23
+##      Last Edited February 23
 ##
 ##
 ###
@@ -25,6 +25,7 @@ library(ape)
 library(tidyverse)
 library(ggeffects) 
 library(lme4)
+library(RColorBrewer)
 
 ## load functions 
 # source("C:/analysis/functions/GreenFigures.R")
@@ -38,6 +39,16 @@ myArrow <- function(x0, y0, x1, y1, cut = .95, ...){
   # segments(x0, y0, x1, y1, ...) #if you want the arrow to continue
   arrows(x0, y0, x.new, y.new, ...)
 }
+
+## set colors
+wGem<-c("#FFFFE5")
+
+yGem<-c("#FE9929")
+oGem<-c("#CC4C02")
+rGem<-c("#662506")# col2rgb(rGem)
+
+gemma<-c(16,17)
+gems<-c("#35978F","#807DBA")#colors for symbols woody non-woody
 
 ## load data
 # save (try3, file = paste0(path, "/Data/PSF.RES.benpet.Rdata")) # 2.linking PSF with RES
@@ -103,12 +114,11 @@ summary(m2)
 # F-statistic: 5.831 on 3 and 57 DF,  p-value: 0.001514
 
 ## figures
-gems<-c("olivedrab3", "lightgoldenrod4")
 
 # PSFs in Trait space (Figure 4)
 tiff('Plots/PSFs.in.traitspace.petben.tiff',
      width = 20, height = 20, units = "cm", res = 400 , pointsize= 15,bg="white")
-par(mar = c(4, 4, 1, 2),xpd = T)
+par(mar = c(4, 4, 1, 1),xpd = T)
 
 #try3$Homecols<-ifelse(try3$Hbio<0, "red", "green")
 
@@ -120,6 +130,8 @@ plot(try3$PCA1rev.x,try3$PCA2.x,
      ylab=c("Conservation gradient")
 )
 #segments(try3$PCA1rev.x,try3$PCA2.x,-try3$PCA1.y,try3$PCA2.y, col=c("lightgray"))
+polygon(c(53.65,-53.65,-53.65,53.65),c(0,0,53.65,53.65), density=30, angle=45, col= rgb(102,37,6, max=255, alpha = 51))#pathogen
+polygon(c(-53.65,-53.65,0,0),c(53.65,-53.65,-53.65,53.65),density=30, angle=-45, col= rgb(254, 153, 41, max = 255, alpha = 51))#mutualists
 
 abline(h=0, col="lightgray",xpd = F)
 abline(v=0, col="lightgray",xpd = F)
@@ -130,12 +142,12 @@ myArrow(try3$PCA1rev.x,try3$PCA2.x,try3$PCA1rev.y,try3$PCA2.y, length = 0.1, ang
 text(try3$PCA1rev.x,try3$PCA2.x, font=3, 
      labels = try3$Species.A, pos=1, offset = .15, cex=0.5, col="darkgray") 
 
-#segments(-expl.cons$PCA1.x,expl.cons$PCA2.x,-expl.cons$PCA1.y,expl.cons$PCA2.y, col=c("green"))
+segments(-expl.cons$PCA1.x,expl.cons$PCA2.x,-expl.cons$PCA1.y,expl.cons$PCA2.y, col=c("green"))
 #segments(-expl.coll$PCA1.x,expl.coll$PCA2.x,-expl.coll$PCA1.y,expl.coll$PCA2.y, col=c("orange"))
 
-text(-40,33,'outsourcer-fast', col=rgb(1,0,1), cex=1)
-text(40,33,'DIY-fast', col=rgb(1,0,0),cex=1)
-text(-40,-33,'outsourcer-slow',col=rgb(0, 0, 1), cex=1)
+text(-40,33,'outsourcer-fast', col=oGem, cex=1)
+text(40,33,'DIY-fast', col=rGem,cex=1)
+text(-40,-33,'outsourcer-slow',col=yGem, cex=1)
 text(40,-33, 'DIY-slow', col=c("darkgray"),cex=1)
 
 points(try3$PCA1rev.y,try3$PCA2.y,  
@@ -144,6 +156,10 @@ points(try3$PCA1rev.y,try3$PCA2.y,
 #legend("topright",inset = c( 0, 0),  
 #       paste0(levels((as.factor(try3$strategy)))," (",table(as.factor(try3$strategy)), ")"),
 #       col=stratcols, cex=1, pch=16, bty="n" )
+legend("topright",inset = c( -0, 0),  
+       paste0(levels(droplevels(as.factor(try$woodiness)))," (",table(try$woodiness), ")"),
+       cex=1, pch=16,col=gems, bty="n" )
+
 legend("bottomright",inset = c(0, 0),c("Home","Away"),pch=c(16,1),bty="n")
 
 points(try3$PCA1rev.x,try3$PCA2.x,  
@@ -155,7 +171,7 @@ points(try3$PCA1rev.x,try3$PCA2.x,
 dev.off()
 
 # relations between variables (supplementary)
-stratcols<-c(rgb(1,0, 0), "gray", rgb(1, 0, 1),rgb(0, 0, 1))
+stratcols<-c(rGem, "gray", oGem,yGem)
 
 tiff('Plots/relationsbetweenvariables.tiff',
      width = 30, height = 15, units = "cm", res = 400 , pointsize= 12,bg="white")
@@ -217,7 +233,7 @@ range(try3$Hbio)
 meanHbio$PSF_fact<-cut(meanHbio$PSF, c(-3,-2,-1,0,1), labels= c(-2,-1,0,1))
 
 # # PSF home sterile over gradients (Figure 5) the actual figure
-psfcols<-c("red", "orange", "lightgray","darkblue")
+psfcols<-c("darkred", "red", "lightgray","darkblue")
 
 tiff('Plots/IsolatedHomeEffects.tiff',
      width = 15, height = 15, units = "cm", res = 400 , pointsize= 12,bg="white")
@@ -236,10 +252,10 @@ legend("topright",inset = c( -0, 0), title=expression("PSF"[live/control]),
        paste0(levels(droplevels(as.factor(meanHbio$PSF_fact)))),
        cex=1, pch=16,col=psfcols, bty="n" )
 
-text(-40,33,'outsourcer-fast', col=rgb(1,0,1), cex=1)
-text(40,23,'DIY-fast', col=rgb(1,0,0),cex=1)
-text(-40,-33,'outsourcer-slow',col=rgb(0, 0, 1), cex=1)
-text(40,-33, 'DIY-slow', col=c("darkgray"),cex=1)
+text(-30,30,'outsourcer-fast', col=oGem, cex=1)
+text(30,30,'DIY-fast', col=rGem,cex=1)
+text(-30,-30,'outsourcer-slow',col=yGem, cex=1)
+text(30,-30, 'DIY-slow', col=c("darkgray"),cex=1)
 
 dev.off()
 
@@ -262,7 +278,8 @@ if (interactive()) {
   par(oma=c(0,0,0,0),mar=c(4,5,1,1))
   
   # no distance cons gradient
-  plot(HAa~coll.diff,data=try3[try3$cons.diff_fact=="same strategy",],col=stratcols[try3[try3$cons.diff_fact=="same strategy",]$strategytrait], 
+  plot(HAa~coll.diff,data=try3[try3$cons.diff_fact=="same strategy",],
+       col=stratcols[try3[try3$cons.diff_fact=="same strategy",]$strategytrait], 
        main="a) Same on conservation axis", pch=16, ylim=c(-2.5,1),las=1,bty="l", tck=.005, 
        xlab="", ylab= expression("PSF"[home/away]),cex.lab=1,cex.main = 1, 
        font.main=1 ,col.lab="black",col.axis="black")
@@ -272,7 +289,7 @@ if (interactive()) {
   mO <- lm(HAa~coll.diff,data=try3[try3$strategytrait=="DIY-fast" & try3$cons.diff_fact=="same strategy",])
   xs <- range(try3[try3$strategytrait=="DIY-fast" & try3$cons.diff_fact=="same strategy",]$coll.diff)
   ys <- predict(mO, newdata = data.frame(coll.diff = xs))
-  lines(xs, ys, col = rgb(1,0,0), lwd = 2)
+  lines(xs, ys, col = rGem, lwd = 2)
   
   mO <- lm(HAa~coll.diff,data=try3[try3$strategytrait=="DIY-slow" & try3$cons.diff_fact=="same strategy",])
   xs <- range(try3[try3$strategytrait=="DIY-slow" & try3$cons.diff_fact=="same strategy",]$coll.diff)
@@ -287,7 +304,7 @@ if (interactive()) {
   mO <- lm(HAa~coll.diff,data=try3[try3$strategytrait=="outsource-slow" & try3$cons.diff_fact=="same strategy",])
   xs <- range(try3[try3$strategytrait=="outsource-slow" & try3$cons.diff_fact=="same strategy",]$coll.diff)
   ys <- predict(mO, newdata = data.frame(coll.diff = xs))
-  lines(xs, ys, col = rgb(0,0,1), lwd = 2)
+  lines(xs, ys, col = yGem, lwd = 2)
   
   screen(2) # prepare screen 1 for output##Adjust for area 
   par(oma=c(0,0,0,0),mar=c(4,3,1,1))
@@ -301,7 +318,7 @@ if (interactive()) {
   mO <- lm(HAa~coll.diff,data=try3[try3$strategytrait=="DIY-fast" & try3$cons.diff_fact=="negative",])
   xs <- range(try3[try3$strategytrait=="DIY-fast" & try3$cons.diff_fact=="negative",]$coll.diff)
   ys <- predict(mO, newdata = data.frame(coll.diff = xs))
-  lines(xs, ys, col = rgb(1,0,0), lwd = 2)
+  lines(xs, ys, col = rGem, lwd = 2)
   
   mO <- lm(HAa~coll.diff,data=try3[try3$strategytrait=="DIY-slow" & try3$cons.diff_fact=="negative",])
   xs <- range(try3[try3$strategytrait=="DIY-slow" & try3$cons.diff_fact=="negative",]$coll.diff)
@@ -311,12 +328,12 @@ if (interactive()) {
   mO <- lm(HAa~coll.diff,data=try3[try3$strategytrait=="outsource-fast" & try3$cons.diff_fact=="negative",])
   xs <- range(try3[try3$strategytrait=="outsource-fast" & try3$cons.diff_fact=="negative",]$coll.diff)
   ys <- predict(mO, newdata = data.frame(coll.diff = xs))
-  lines(xs, ys, col = rgb(1,0,1), lwd = 2)
+  lines(xs, ys, col = oGem, lwd = 2)
   
   mO <- lm(HAa~coll.diff,data=try3[try3$strategytrait=="outsource-slow" & try3$cons.diff_fact=="negative",])
   xs <- range(try3[try3$strategytrait=="outsource-slow" & try3$cons.diff_fact=="negative",]$coll.diff)
   ys <- predict(mO, newdata = data.frame(coll.diff = xs))
-  lines(xs, ys, col = rgb(0,0,1), lwd = 2)
+  lines(xs, ys, col = yGem, lwd = 2)
   
   screen(3) # prepare screen 1 for output##Adjust for area
   par(oma=c(0,0,0,0),mar=c(4,3,1,1))
@@ -329,7 +346,7 @@ if (interactive()) {
   mO <- lm(HAa~coll.diff,data=try3[try3$strategytrait=="DIY-fast" & try3$cons.diff_fact=="positive",])
   xs <- range(try3[try3$strategytrait=="DIY-fast" & try3$cons.diff_fact=="positive",]$coll.diff)
   ys <- predict(mO, newdata = data.frame(coll.diff = xs))
-  lines(xs, ys, col = rgb(1,0,0), lwd = 2)
+  lines(xs, ys, col = rGem, lwd = 2)
   
   mO <- lm(HAa~coll.diff,data=try3[try3$strategytrait=="DIY-slow" & try3$cons.diff_fact=="positive",])
   xs <- range(try3[try3$strategytrait=="DIY-slow" & try3$cons.diff_fact=="positive",]$coll.diff)
@@ -339,7 +356,7 @@ if (interactive()) {
   mO <- lm(HAa~coll.diff,data=try3[try3$strategytrait=="outsource-fast" & try3$cons.diff_fact=="positive",])
   xs <- range(try3[try3$strategytrait=="outsource-fast" & try3$cons.diff_fact=="positive",]$coll.diff)
   ys <- predict(mO, newdata = data.frame(coll.diff = xs))
-  lines(xs, ys, col = rgb(1,0,1), lwd = 2)
+  lines(xs, ys, col = oGem, lwd = 2)
   
   #mO <- lm(HAa~coll.diff,data=try3[try3$strategytrait=="outsource-slow" & try3$cons.diff_fact=="positive",])
   #xs <- range(try3[try3$strategytrait=="outsource-slow" & try3$cons.diff_fact=="positive",]$coll.diff)
