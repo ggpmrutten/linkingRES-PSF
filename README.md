@@ -1,3 +1,5 @@
+[![DOI](https://zenodo.org/badge/596455574.svg)](https://zenodo.org/badge/latestdoi/596455574)
+
 # Analysis MS review Plant&Soil
 by Gemma Rutten (gemma.rutten@unibe.ch)
 
