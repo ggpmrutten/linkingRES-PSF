@@ -21,6 +21,7 @@ rm(list=ls())
 library(tidyverse)
 library(vegan)
 
+
 ## load functions 
 len<-function(x){length(na.omit(x))} 
 se<-function(x){sd(na.omit(x))/length(na.omit(x))}

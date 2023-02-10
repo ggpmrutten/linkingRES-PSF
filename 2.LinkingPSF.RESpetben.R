@@ -22,6 +22,7 @@ library(ape)
 #library(geiger)
 library(tidyverse)
 
+
 ## load functions 
 len<-function(x){length(na.omit(x))} 
 mansca<-function(x){x/sqrt(sum(x^2)/(length(x)-1))}

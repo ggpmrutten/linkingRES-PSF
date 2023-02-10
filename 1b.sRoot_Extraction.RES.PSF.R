@@ -4,7 +4,7 @@
 ##  Project: Review Plant & Soil
 ##
 ##  by  Gemma Rutten (gemma.rutten@unibe.ch)
-##      Last Edited January 23
+##      Last Edited February 23
 ##
 ##
 ### Used data from Petermann et al 2008 and Bennett et al 
@@ -22,6 +22,7 @@ library(ape)
 library(geiger)
 library(tidyverse)
 library(phytools)
+library(RColorBrewer)
 
 ## functions
 mansca<-function(x){x/sqrt(sum(x^2)/(length(x)-1))}
@@ -125,8 +126,13 @@ summary(lm(PCA1 ~ RTD_corrected, data=traits.RES))#R2 adj -0.01814 , p-value: NS
 summary(lm(PCA2 ~ RTD_corrected, data=traits.RES))#R2 adj 0.463 , p-value: 4.144e-06
 
 ######  Figure: All Species in RES  #####
+
+yGem<-c("#FE9929")
+oGem<-c("#CC4C02")
+rGem<-c("#662506")# col2rgb(rGem)
+
 gemma<-c(16,17)
-gems<-c("olivedrab3", "lightgoldenrod4")
+gems<-c("#35978F","#807DBA")#colors for symbols
 summary(phylpca)
 
 ## first calculate vectors 
@@ -162,8 +168,10 @@ plot(traits.RES$PCA1rev,traits.RES$PCA2, pch=gemma[droplevels(as.factor(traits.R
      xlab=paste0("PC1"," (", round(0.4913097 ,2),")"),
      ylab=paste0("PC2"," (", round(0.2680714 ,2),")"))
 #abline(h=0, col="darkgray",xpd = F); abline(v=0,col="darkgray",xpd = F)
-polygon(c(53.65,-53.65,-53.65,53.65),c(0,0,53.65,53.65),density=30,  angle=45, col= rgb(255,0,0,max=255,alpha = (100 - 80) * 255 / 100))#pathogen
-polygon(c(-53.65,-53.65,0,0),c(53.65,-53.65,-53.65,53.65),density=30, angle=-45,col= rgb(0,0,255,max=255,alpha = (100 - 80) * 255 / 100))#mutualists
+
+polygon(c(53.65,-53.65,-53.65,53.65),c(0,0,53.65,53.65), density=30, angle=45, col= rgb(102,37,6, max=255, alpha = 51))#pathogen
+polygon(c(-53.65,-53.65,0,0),c(53.65,-53.65,-53.65,53.65),density=30, angle=-45, col= rgb(254, 153, 41, max = 255, alpha = 51))#mutualists
+
 text(traits.RES$PCA1rev,traits.RES$PCA2, font=3, col="black",
      labels = traits.RES$species.full,pos=1, offset = 0.15, cex=.5)
 
@@ -174,9 +182,9 @@ arrows(0,0,-datapc1$v1[4],datapc1$v2[4],col="black",length = 0.05, angle = 35)
 
 text(-datapc1$v1,datapc1$v2,pos=c(2,4,1,3),offset =.5, font=1, labels = datapc1$lab,  cex=.8, col="black") 
 
-text(-40,33,'outsourcer-fast', col=rgb(1,0,1), cex=1)
-text(40,33,'DIY-fast', col=rgb(1,0,0),cex=1)
-text(-40,-33,'outsourcer-slow',col=rgb(0,0,1), cex=1)
+text(-40,33,'outsourcer-fast', col=oGem, cex=1)
+text(40,33,'DIY-fast', col=rGem,cex=1)
+text(-40,-33,'outsourcer-slow',col=yGem, cex=1)
 text(40,-33, 'DIY-slow', col=c("darkgray"),cex=1)
 
 legend("topright",inset = c( -0, 0),  
@@ -197,8 +205,9 @@ plot(traits.RES$PCA1rev,traits.RES$PCA2, col="white",
      xlim=c(-50,50),ylim=c(-50,50),
      xlab="", ylab="")
 abline(h=0, col="darkgray",xpd = F); abline(v=0,col="darkgray",xpd = F)
-polygon(c(53.65,-53.65,-53.65,53.65),c(0,0,53.65,53.65),density=30,  angle=45, col= rgb(255,0,0,max=255,alpha = (100 - 80) * 255 / 100))#pathogen
-polygon(c(-53.65,-53.65,0,0),c(53.65,-53.65,-53.65,53.65),density=30, angle=-45,col= rgb(0,0,255,max=255,alpha = (100 - 80) * 255 / 100))#mutualists
+polygon(c(53.65,-53.65,-53.65,53.65),c(0,0,53.65,53.65), density=30, angle=45, col= rgb(102,37,6, max=255, alpha = 51))#pathogen
+polygon(c(-53.65,-53.65,0,0),c(53.65,-53.65,-53.65,53.65),density=30, angle=-45, col= rgb(254, 153, 41, max = 255, alpha = 51))#mutualists
+
 #text(-traits.RES$PCA1,traits.RES$PCA2, font=3,
 #     labels = traits.RES$species.full,pos=1, offset = 0.1, cex=.5)
 
@@ -209,9 +218,9 @@ arrows(0,0,-datapc1$v1[4],datapc1$v2[4],col="black",length = 0.05, angle = 35, l
 
 text(-datapc1$v1,datapc1$v2,pos=c(2,4,1,3),offset =.5, font=1, labels = datapc1$lab,  cex=.8, col="black") 
 
-text(-40,33,'outsourcer-fast', col=rgb(1,0,1), cex=1)
-text(40,33,'DIY-fast', col=rgb(1,0,0),cex=1)
-text(-40,-33,'outsourcer-slow',col=rgb(0, 0, 1), cex=1)
+text(-40,33,'outsourcer-fast', col=oGem, cex=1)
+text(40,33,'DIY-fast', col=rGem,cex=1)
+text(-40,-33,'outsourcer-slow',col=yGem, cex=1)
 text(40,-33, 'DIY-slow', col=c("darkgray"),cex=1)
 
 dev.off()
